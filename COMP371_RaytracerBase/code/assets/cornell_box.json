@@ -177,9 +177,9 @@
             "type":"rectangle",
 
             "p1":[82, 0, -225],
-            "p2":[82, 165, -225],
+            "p4":[82, 165, -225],
             "p3":[130, 165, -65.0],
-            "p4":[130, 0, -65],
+            "p2":[130, 0, -65],
 
 
             "ac":[1,0,1],
@@ -347,8 +347,8 @@
 
         "globalillum": true,
         "raysperpixel": [10, 10],
-        "maxbounces": 5,
-        "probterminate": 0.2
+        "maxbounces": 3,
+        "probterminate": 0.333
     }
     ]
 }
