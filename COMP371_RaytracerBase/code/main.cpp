@@ -1,7 +1,7 @@
 
 
 #ifdef COURSE_SOLUTION
-#include "src/RayTracer.h"
+//#include "src/RayTracer.h"
 #endif
 
 #ifdef STUDENT_SOLUTION
@@ -55,9 +55,9 @@ int main(int argc, char* argv[])
         cout<<"Running course solution"<<endl;
         time_t tstart, tend;
         tstart = time(0);
-        RT371::RayTracer<RT371::Kernelf> rt(j);
-        cout<<"Running!"<<endl;
-        rt.run();
+//        RT371::RayTracer<RT371::Kernelf> rt(j);
+//        cout<<"Running!"<<endl;
+//        rt.run();
         tend = time(0);
         cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 #else
@@ -67,7 +67,9 @@ int main(int argc, char* argv[])
 
         time_t tstart, tend;
         tstart = time(0);
+        cout<<"Running!"<<endl;
         RayTracer rt(j);
+        cout<<"Still Running!"<<endl;
         rt.run();
         tend = time(0);
         cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
@@ -75,9 +77,9 @@ int main(int argc, char* argv[])
         // GIven code - a bunch of test functions to showcase the funcitonality
         test_eigen();
         test_save_ppm();
-        
+
         if(test_json(j)==0){
-            
+
         } else {
             cout<<"Could not load file!"<<endl;
         }

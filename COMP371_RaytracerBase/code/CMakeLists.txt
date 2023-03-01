@@ -9,14 +9,14 @@ project(raytracer)
 # in the src folder; Without this file the code base will not compile therefore in your 
 # code this define is disabled
 # Also do not forget to create the src folder under code
-#add_compile_options(-DSTUDENT_SOLUTION)
+add_compile_options(-DSTUDENT_SOLUTION)
 
 
 # 2
 # This define is used by the teaching team to compile and run the official solution
 # Students: for your project this define should always be commented out
 # If we commit it by mistake please disable it and let us know
-add_compile_options(-DCOURSE_SOLUTION)
+#add_compile_options(-DCOURSE_SOLUTION)
 
 
 # When testing large scenes the debug mode will be very slow
@@ -53,5 +53,5 @@ include_directories(external/)
 aux_source_directory(external SOURCE)
 aux_source_directory(src SOURCE)
 
-add_executable(raytracer main.cpp ${SOURCE}) #The name of the cpp file and its path can vary
+add_executable(raytracer main.cpp ${SOURCE} src/Geometry.cpp src/Geometry.h src/Light.cpp src/Light.h src/Camera.cpp src/Camera.h src/Ray.cpp src/Ray.h src/RayTracer.cpp src/RayTracer.h src/HitRecord.cpp src/HitRecord.h src/Surface.cpp src/Surface.h) #The name of the cpp file and its path can vary
 
