@@ -53,5 +53,5 @@ include_directories(external/)
 aux_source_directory(external SOURCE)
 aux_source_directory(src SOURCE)
 
-add_executable(raytracer main.cpp ${SOURCE} src/Geometry.cpp src/Geometry.h src/Light.cpp src/Light.h src/Camera.cpp src/Camera.h src/Ray.cpp src/Ray.h src/RayTracer.cpp src/RayTracer.h src/HitRecord.cpp src/HitRecord.h src/Surface.cpp src/Surface.h) #The name of the cpp file and its path can vary
+add_executable(raytracer main.cpp ${SOURCE} src/Geometry.cpp src/Geometry.h src/RayTracer.cpp src/RayTracer.h src/Light.cpp src/Light.h src/HitRecord.cpp src/HitRecord.h src/Output.cpp src/Output.h) #The name of the cpp file and its path can vary
 

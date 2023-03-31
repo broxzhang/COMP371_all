@@ -9,9 +9,9 @@
 #include <vector>
 
 #include "Geometry.h"
-#include "Light.h"
 #include "json.hpp"
-#include "Camera.h"
+#include "Light.h"
+#include "Output.h"
 
 
 using std::vector;
@@ -23,26 +23,25 @@ class RayTracer {
 public:
     RayTracer(json j);
 
-    //destructor
-    ~RayTracer() {
-        for (auto &i : geometryList) {
-            delete i;
-        }
-        for (auto &i : lightList) {
-            delete i;
-        }
-        delete output;
-    }
+    Vector3f getDiffuseReflection(HitRecord& hit, Ray& ray, Vector3f vec);
+    Vector3f getSpecularReflectance(HitRecord& hrec, Ray& ray, Vector3f& n);
+    Vector3f getRandomVector(Ray& ray, Vector3f hitPoint, Vector3f n);
+    Vector3f getDirectIllumination(const HitRecord& hitRecord, const Vector3f& hitPoint,  const Ray& ray);
+    Vector3f getRandomDirectionInHemisphere(const Vector3f& normal);
+    Vector3f radiance(Ray& ray, int depth);
+    HitRecord intersect(Ray& ray);
+
     void run();
 
-    void outputPPM();
 
-private:
     vector<Geometry*> geometryList;
     vector<Light*> lightList;
-    Output* output;
+    Output output;
 
+    void computeShading(const Ray &ray, HitRecord &hitRecord);
+    bool groupRaycastHit(Ray& ray, float t0, float t1, HitRecord& hitReturn);
 
+    Vector3f computeAmbientColor(const HitRecord &hitRecord);
 };
 
 

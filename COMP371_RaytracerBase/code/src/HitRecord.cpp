@@ -3,3 +3,7 @@
 //
 
 #include "HitRecord.h"
+
+Vector3f Ray::evaluate(float t) const {
+    return origin + t * direction;
+}

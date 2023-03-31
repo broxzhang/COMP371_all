@@ -7,150 +7,217 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include "Ray.h"
-#include "Surface.h"
+#include "HitRecord.h"
 
 using Eigen::Vector3f;
 using namespace std;
 
+class Material {
+public:
+    Vector3f ac; // ambient color
+    Vector3f dc; // diffuse color
+    Vector3f sc; // specular color
 
-//class Geometry {
-//private:
-//    Vector3f ac; // ambient color
-//    Vector3f dc; // diffuse color
-//    Vector3f sc; // specular color
-//
-//
-//
-//    double ka; // ambient coefficient
-//    double kd; // diffuse coefficient
-//    double ks; // specular coefficient
-//
-//    double pc; // phong coefficient
-//
-//public:
-//    Geometry(Vector3f ac, Vector3f dc, Vector3f sc, double ka, double kd, double ks, double pc) : ac(ac), dc(dc), sc(sc), ka(ka), kd(kd), ks(ks), pc(pc) {}
-//
-//    //destructors
-//    virtual ~Geometry() = default;
-//
-//    // output stream
-//    friend std::ostream& operator<<(std::ostream& os, const Geometry& geometry) {
-//        os << "Geometry: " << geometry.ac << " " << geometry.dc << " " << geometry.sc << " " << geometry.ka << " " << geometry.kd << " " << geometry.ks << " " << geometry.pc << std::endl;
-//        return os;
-//    }
-//
-//    //inline setters and getters
-//    inline Vector3f getAc() const {
-//        return ac;
-//    }
-//
-//    inline Vector3f getDc() const {
-//        return dc;
-//    }
-//
-//    inline Vector3f getSc() const {
-//        return sc;
-//    }
-//
-//    inline double getKa() const {
-//        return ka;
-//    }
-//
-//    inline double getKd() const {
-//        return kd;
-//    }
-//
-//    inline double getKs() const {
-//        return ks;
-//    }
-//
-//    inline double getPc() const {
-//        return pc;
-//    }
-//
-//    virtual bool intersect(Ray ray, float d);
-//
-//    virtual string getType() = 0;
-//};
-//
-//class Sphere : public Geometry, public Surface{
-//private:
-//    Vector3f center;
-//    double radius;
-//    string type = "Sphere";
-//public:
-//
-//    //constructors from superclass
-//    Sphere(Vector3f ac, Vector3f dc, Vector3f sc, double ka, double kd, double ks, double pc, Vector3f center, double radius) : Geometry(ac, dc, sc, ka, kd, ks, pc), center(center), radius(radius) {}
-//
-//    //destructors
-//    ~Sphere() = default;
-//
-//    Vector3f getCenter() const {
-//        return center;
-//    }
-//
-//    double getRadius() const {
-//        return radius;
-//    }
-//
-//    void setCenter(Vector3f center) {
-//        this->center = center;
-//    }
-//
-//    void setRadius(double radius) {
-//        this->radius = radius;
-//    }
-//
-//    Vector3f getNormal(Vector3f point) {
-//        return (point - center).normalized();
-//    }
-//
-//    string getType() {
-//        return type;
-//    }
-//
-//    //output stream
-//    friend std::ostream& operator<<(std::ostream& os, const Sphere& sphere) {
-//        os << "Sphere: " << sphere.center << " " << sphere.radius << static_cast<const Geometry&>(sphere) << std::endl;
-//        return os;
-//    }
-//
-//    bool intersect(Ray ray, float d);
-//};
-//
-//class Rectangle : public Geometry {
-//private:
-//    Vector3f p1;
-//    Vector3f p2;
-//    Vector3f p3;
-//    Vector3f p4;
-//
-//    string type = "Rectangle";
-//
-//public:
-//    //constructors
-//    Rectangle(Vector3f ac, Vector3f dc, Vector3f sc, double ka, double kd, double ks, double pc, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4) : Geometry(ac, dc, sc, ka, kd, ks, pc), p1(p1), p2(p2), p3(p3), p4(p4) {}
-//   //destructors
-//    ~Rectangle() = default;
-//
-//    // inline getters and setters
-//    inline Vector3f getP1() const { return p1; }
-//    inline Vector3f getP2() const { return p2; }
-//    inline Vector3f getP3() const { return p3; }
-//    inline Vector3f getP4() const { return p4; }
-//
-//    inline void setP1(Vector3f p1) { this->p1 = p1; }
-//    inline void setP2(Vector3f p2) { this->p2 = p2; }
-//    inline void setP3(Vector3f p3) { this->p3 = p3; }
-//    inline void setP4(Vector3f p4) { this->p4 = p4; }
-//
-//    string getType() {
-//        return type;
-//    }
-//
-//};
+    float ka; // ambient coefficient
+    float kd; // diffuse coefficient
+    float ks; // specular coefficient
+    float pc; // phong coefficient
+
+    //default constructor
+    Material() : ac(Vector3f(0, 0, 0)), dc(Vector3f(0, 0, 0)), sc(Vector3f(0, 0, 0)), ka(0), kd(0), ks(0), pc(0) {}
+
+    //copy constructor
+    Material(const Material& material) : ac(material.ac), dc(material.dc), sc(material.sc), ka(material.ka), kd(material.kd), ks(material.ks), pc(material.pc) {}
+
+    //constructor
+    Material(Vector3f ac, Vector3f dc, Vector3f sc, float ka, float kd, float ks, float pc) : ac(ac), dc(dc), sc(sc), ka(ka), kd(kd), ks(ks), pc(pc) {}
+
+    //operator=
+    Material& operator=(const Material& material) {
+        ac = material.ac;
+        dc = material.dc;
+        sc = material.sc;
+        ka = material.ka;
+        kd = material.kd;
+        ks = material.ks;
+        pc = material.pc;
+        return *this;
+    }
+
+    //output
+    friend ostream& operator<<(ostream& os, const Material& material) {
+        os << "ac: " << material.ac << endl;
+        os << "dc: " << material.dc << endl;
+        os << "sc: " << material.sc << endl;
+        os << "ka: " << material.ka << endl;
+        os << "kd: " << material.kd << endl;
+        os << "ks: " << material.ks << endl;
+        os << "pc: " << material.pc << endl;
+        return os;
+    }
+
+    //destructor
+    ~Material() {}
+
+    Vector3f evalBRDF(const HitRecord& hitRecord, const Vector3f& viewDirection, const Vector3f& lightDirection, const Vector3f& halfVector);
+
+};
+class Surface {
+public:
+    Material material;
+    Vector3f center;
+
+    //default constructor
+    Surface() : material(Material()), center(0) {}
+
+    //copy constructor
+    Surface(const Surface& surface) : material(surface.material), center(surface.center) {}
+
+    //constructor
+    Surface(Material material, Vector3f center) : material(material), center(center) {}
+
+    //operator=
+    Surface& operator=(const Surface& surface) {
+        material = surface.material;
+        center = surface.center;
+        return *this;
+    }
+
+    //output
+    friend ostream& operator<<(ostream& os, const Surface& surface) {
+        os << "material: " << surface.material << endl;
+        os << "center: " << surface.center << endl;
+        return os;
+    }
+
+    //destructor
+    ~Surface() {}
+
+};
+
+class Geometry {
+public:
+    string type;
+    Surface surface;
+    bool visible = true;
+
+    //default constructor
+    Geometry() : type("default"), surface(Surface()) {}
+
+    //copy constructor
+    Geometry(const Geometry& geometry) : type(geometry.type), surface(geometry.surface) {}
+
+    //constructor
+    Geometry(string type, Surface surface) : type(type), surface(surface) {}
+
+    //operator=
+    Geometry& operator=(const Geometry& geometry) {
+        type = geometry.type;
+        surface = geometry.surface;
+        return *this;
+    }
+
+    //destructor
+    virtual ~Geometry() {}
+
+    virtual HitRecord intersect(const Ray& ray) const = 0;
+
+    virtual bool hit(const Ray& ray, float t0, float closestHitDistance, HitRecord& currentHitRecord) = 0;
+
+
+    //getter and setter
+    bool isVisible() const {
+        return visible;
+    }
+
+    void setVisible(bool visible) {
+        Geometry::visible = visible;
+    }
+
+    const string &getType() const {
+        return type;
+    }
+
+    void setType(const string &type) {
+        Geometry::type = type;
+    }
+
+    const Surface &getSurface() const {
+        return surface;
+    }
+
+    void setSurface(const Surface &surface) {
+        Geometry::surface = surface;
+    }
+};
+
+class Sphere : public Geometry {
+private:
+    float radius;
+
+public:
+    //default constructor
+    Sphere() : Geometry(), radius(0) {}
+
+    //copy constructor
+    Sphere(const Sphere& sphere) : Geometry(sphere), radius(sphere.radius) {}
+
+    //constructor
+    Sphere( Surface surface, float radius) : Geometry("Sphere", surface), radius(radius) {}
+
+    //operator=
+    Sphere& operator=(const Sphere& sphere) {
+        Geometry::operator=(sphere);
+        radius = sphere.radius;
+        return *this;
+    }
+
+    //output
+    friend ostream& operator<<(ostream& os, const Sphere& sphere) {
+        os << "type: " << sphere.getType() << endl;
+        os << "surface: " << sphere.getSurface() << endl;
+        os << "radius: " << sphere.radius << endl;
+        return os;
+    }
+    //destructor
+    ~Sphere() {}
+
+    virtual HitRecord intersect(const Ray& ray) const;
+
+    bool hit(const Ray& ray, float t0, float closestHitDistance, HitRecord& currentHitRecord) override;
+};
+
+class Rectangle : public Geometry {
+private:
+    Vector3f p1, p2, p3, p4;
+
+public:
+    //default constructor
+    Rectangle() : Geometry(), p1(Vector3f(0, 0, 0)), p2(Vector3f(0, 0, 0)), p3(Vector3f(0, 0, 0)), p4(Vector3f(0, 0, 0)) {}
+
+    //copy constructor
+    Rectangle(const Rectangle& rectangle) : Geometry(rectangle), p1(rectangle.p1), p2(rectangle.p2), p3(rectangle.p3), p4(rectangle.p4) {}
+
+    //constructor
+    Rectangle(Surface surface, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4) : Geometry("Rectangle", surface), p1(p1), p2(p2), p3(p3), p4(p4) {}
+
+    //operator=
+    Rectangle& operator=(const Rectangle& rectangle) {
+        Geometry::operator=(rectangle);
+        p1 = rectangle.p1;
+        p2 = rectangle.p2;
+        p3 = rectangle.p3;
+        p4 = rectangle.p4;
+        return *this;
+    }
+
+    //destructor
+    ~Rectangle() {}
+
+    virtual HitRecord intersect(const Ray& ray) const override;
+
+    bool hit(const Ray& ray, float t0, float closestHitDistance, HitRecord& currentHitRecord) override;
+};
 
 
 
