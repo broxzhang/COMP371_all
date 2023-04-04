@@ -5,6 +5,8 @@
 #ifndef RAYTRACER_OUTPUT_H
 #define RAYTRACER_OUTPUT_H
 
+#pragma once
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <vector>

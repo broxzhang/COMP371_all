@@ -5,12 +5,16 @@
 #ifndef RAYTRACER_HITRECORD_H
 #define RAYTRACER_HITRECORD_H
 
+#pragma once
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include "Geometry.h"
 
 using Eigen::Vector3f;
 using namespace std;
+
+class Material;
 
 class Ray {
 public:
@@ -56,18 +60,17 @@ public:
     Vector3f p, n; // p: point of intersection, n: normal at intersection
     float t; // t: distance from ray origin to intersection point
     bool hit; // hit: whether the ray hits the object
-    Material* material; // material: material of the object
-
-public:
+    const Material* material; // material: material of the object
+    Vector3f color; // color: color of the object
     // default constructor
-    HitRecord() : p(Vector3f(0, 0, 0)), n(Vector3f(0, 0, 0)), t(0), hit(false), material(nullptr) {}
-
+    HitRecord() : p(Vector3f(0, 0, 0)), n(Vector3f(0, 0, 0)), t(0), hit(false), material(nullptr), color(Vector3f(0, 0, 0)) {}
     // constructor with all parameters
-    HitRecord(Vector3f p, Vector3f n, float t, bool hit, Material* material) : p(p), n(n), t(t), hit(hit), material(material) {}
-
+    HitRecord(Vector3f p, Vector3f n, float t, bool hit, Material* material, Vector3f color) : p(p), n(n), t(t), hit(hit), material(material), color(color) {}
     // copy constructor
-    HitRecord(const HitRecord& hitRecord) : p(hitRecord.p), n(hitRecord.n), t(hitRecord.t), hit(hitRecord.hit), material(hitRecord.material) {}
+    HitRecord(const HitRecord& hitRecord) : p(hitRecord.p), n(hitRecord.n), t(hitRecord.t), hit(hitRecord.hit), material(hitRecord.material), color(hitRecord.color) {}
 
+    // Constructor that only have t
+    HitRecord(float t) : p(Vector3f(0, 0, 0)), n(Vector3f(0, 0, 0)), t(t), hit(false), material(nullptr), color(Vector3f(0, 0, 0)) {}
     // operator=
     HitRecord& operator=(const HitRecord& hitRecord) {
         p = hitRecord.p;
@@ -75,6 +78,7 @@ public:
         t = hitRecord.t;
         hit = hitRecord.hit;
         material = hitRecord.material;
+        color = hitRecord.color;
         return *this;
     }
 

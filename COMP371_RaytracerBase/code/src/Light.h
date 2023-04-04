@@ -5,8 +5,13 @@
 #ifndef RAYTRACER_LIGHT_H
 #define RAYTRACER_LIGHT_H
 
+#pragma once
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
+
+#include "HitRecord.h"
+
 
 using Eigen::Vector3f;
 using namespace std;
@@ -25,13 +30,16 @@ public:
     virtual Vector3f getDirection(const Vector3f& hitPoint) const = 0;
     virtual float getDistance(const Vector3f& hitPoint) const = 0;
     virtual Vector3f getIntensity(const Vector3f& hitPoint) const = 0;
+
+    virtual Vector3f computeContribution(const Ray& ray, const HitRecord& hitRecord) const = 0;
+
 };
 
 class AreaLight : public Light {
 public:
     Vector3f p1, p2, p3, p4; // four points of the area light
     int n;
-    bool useCenter = true;
+    bool useCenter = false;
 
     // Constructor with parameters
     AreaLight(Vector3f id, Vector3f is, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, int n) : Light("Area",id, is), p1(p1), p2(p2), p3(p3), p4(p4), n(n) {}
@@ -63,6 +71,9 @@ public:
         float distance = getDistance(hitPoint);
         return is / (distance * distance);
     }
+
+    Vector3f computeContribution(const Ray& ray, const HitRecord& hitRecord) const override;
+
 };
 
 class PointLight : public Light {
@@ -87,6 +98,8 @@ public:
         float distance = getDistance(hitPoint);
         return center / (distance * distance);
     }
+
+    Vector3f computeContribution(const Ray& ray, const HitRecord& hitRecord) const override;
 };
 
 

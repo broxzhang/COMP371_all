@@ -5,12 +5,17 @@
 #ifndef RAYTRACER_GEOMETRY_H
 #define RAYTRACER_GEOMETRY_H
 
+#pragma once
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include "HitRecord.h"
 
 using Eigen::Vector3f;
 using namespace std;
+
+class HitRecord;
+class Ray;
 
 class Material {
 public:
@@ -59,34 +64,30 @@ public:
     //destructor
     ~Material() {}
 
-    Vector3f evalBRDF(const HitRecord& hitRecord, const Vector3f& viewDirection, const Vector3f& lightDirection, const Vector3f& halfVector);
+    Vector3f evalBRDF(const HitRecord& hitRecord, const Vector3f& inDirection, const Vector3f& outDirection) const;
 
 };
 class Surface {
 public:
     Material material;
-    Vector3f center;
 
     //default constructor
-    Surface() : material(Material()), center(0) {}
+    Surface() : material(Material()) {}
 
     //copy constructor
-    Surface(const Surface& surface) : material(surface.material), center(surface.center) {}
+    Surface(const Surface& surface) : material(surface.material) {}
 
     //constructor
-    Surface(Material material, Vector3f center) : material(material), center(center) {}
-
+    Surface(Material material) : material(material) {}
     //operator=
     Surface& operator=(const Surface& surface) {
         material = surface.material;
-        center = surface.center;
         return *this;
     }
 
     //output
     friend ostream& operator<<(ostream& os, const Surface& surface) {
         os << "material: " << surface.material << endl;
-        os << "center: " << surface.center << endl;
         return os;
     }
 
@@ -154,31 +155,25 @@ public:
 class Sphere : public Geometry {
 private:
     float radius;
+    Vector3f center;
 
 public:
     //default constructor
-    Sphere() : Geometry(), radius(0) {}
+    Sphere() : Geometry(), radius(0), center(Vector3f(0, 0, 0)) {}
 
     //copy constructor
-    Sphere(const Sphere& sphere) : Geometry(sphere), radius(sphere.radius) {}
+    Sphere(const Sphere& sphere) : Geometry(sphere), radius(sphere.radius), center(sphere.center) {}
 
     //constructor
-    Sphere( Surface surface, float radius) : Geometry("Sphere", surface), radius(radius) {}
+    Sphere(Surface surface, float radius, Vector3f center) : Geometry("Sphere", surface), radius(radius), center(center) {}
 
     //operator=
     Sphere& operator=(const Sphere& sphere) {
-        Geometry::operator=(sphere);
         radius = sphere.radius;
+        center = sphere.center;
         return *this;
     }
 
-    //output
-    friend ostream& operator<<(ostream& os, const Sphere& sphere) {
-        os << "type: " << sphere.getType() << endl;
-        os << "surface: " << sphere.getSurface() << endl;
-        os << "radius: " << sphere.radius << endl;
-        return os;
-    }
     //destructor
     ~Sphere() {}
 

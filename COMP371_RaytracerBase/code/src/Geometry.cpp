@@ -4,18 +4,16 @@
 
 #include "Geometry.h"
 
-Vector3f Material::evalBRDF(const HitRecord& hitRecord, const Vector3f& viewDirection, const Vector3f& lightDirection, const Vector3f& halfVector) {
-    Vector3f diffuse = kd * dc;
-    float specFactor = pow(std::max(0.0f, hitRecord.n.dot(halfVector)), 32.0f);
-    Vector3f specular = ks * sc * specFactor;
-
-    return diffuse + specular;
+Vector3f Material::evalBRDF(const HitRecord& hitRecord, const Vector3f& inDirection, const Vector3f& outDirection) const {
+    // Simple Lambertian BRDF
+    float lambertian = max(0.0f, hitRecord.n.dot(inDirection));
+    return hitRecord.color * (kd * lambertian);
 }
 
 HitRecord Sphere::intersect(const Ray& ray) const {
     HitRecord hitRecord;
 
-    Vector3f oc = ray.getOrigin() - getSurface().center;
+    Vector3f oc = ray.getOrigin() - center;
     float a = ray.getDirection().dot(ray.getDirection());
     float b = 2.0f * oc.dot(ray.getDirection());
     float c = oc.dot(oc) - radius * radius;
@@ -27,8 +25,8 @@ HitRecord Sphere::intersect(const Ray& ray) const {
             hitRecord.hit = true;
             hitRecord.t = t;
             hitRecord.p = ray.evaluate(t);
-            hitRecord.n = (hitRecord.p - getSurface().center).normalized();
-            hitRecord.material = getSurface().material;
+            hitRecord.n = (hitRecord.p - center).normalized();
+            hitRecord.material = &getSurface().material;
             return hitRecord;
         }
 
@@ -37,8 +35,8 @@ HitRecord Sphere::intersect(const Ray& ray) const {
             hitRecord.hit = true;
             hitRecord.t = t;
             hitRecord.p = ray.evaluate(t);
-            hitRecord.n = (hitRecord.p - getSurface().center).normalized();
-            hitRecord.material = getSurface().material;
+            hitRecord.n = (hitRecord.p - center).normalized();
+            hitRecord.material = &getSurface().material;
             return hitRecord;
         }
     }
@@ -51,7 +49,7 @@ HitRecord Rectangle::intersect(const Ray& ray) const{
     const float EPSILON = 1e-6f;
     HitRecord hit;
     hit.hit = false;
-    hit.material = getSurface().material;
+    hit.material = &getSurface().material;
 
     Vector3f edge1 = p2 - p1;
     Vector3f edge2 = p3 - p1;
@@ -113,7 +111,7 @@ HitRecord Rectangle::intersect(const Ray& ray) const{
 }
 
 bool Sphere::hit(const Ray &ray, float t0, float closestHitDistance, HitRecord &currentHitRecord) {
-    Vector3f oc = ray.getOrigin() - getSurface().center;
+    Vector3f oc = ray.getOrigin() - center;
     float a = ray.getDirection().dot(ray.getDirection());
     float b = 2.0f * oc.dot(ray.getDirection());
     float c = oc.dot(oc) - radius * radius;
@@ -125,8 +123,8 @@ bool Sphere::hit(const Ray &ray, float t0, float closestHitDistance, HitRecord &
             currentHitRecord.hit = true;
             currentHitRecord.t = t;
             currentHitRecord.p = ray.evaluate(t);
-            currentHitRecord.n = (currentHitRecord.p - getSurface().center).normalized();
-            currentHitRecord.material = getSurface().material;
+            currentHitRecord.n = (currentHitRecord.p - center).normalized();
+            currentHitRecord.material = &getSurface().material;
             return true;
         }
 
@@ -135,8 +133,8 @@ bool Sphere::hit(const Ray &ray, float t0, float closestHitDistance, HitRecord &
             currentHitRecord.hit = true;
             currentHitRecord.t = t;
             currentHitRecord.p = ray.evaluate(t);
-            currentHitRecord.n = (currentHitRecord.p - getSurface().center).normalized();
-            currentHitRecord.material = getSurface().material;
+            currentHitRecord.n = (currentHitRecord.p - center).normalized();
+            currentHitRecord.material = &getSurface().material;
             return true;
         }
     }
@@ -148,7 +146,7 @@ bool Rectangle::hit(const Ray &ray, float t0, float closestHitDistance, HitRecor
     const float EPSILON = 1e-6f;
     HitRecord hit;
     hit.hit = false;
-    hit.material = getSurface().material;
+    hit.material = &getSurface().material;
 
     Vector3f edge1 = p2 - p1;
     Vector3f edge2 = p3 - p1;
@@ -205,6 +203,7 @@ bool Rectangle::hit(const Ray &ray, float t0, float closestHitDistance, HitRecor
     currentHitRecord.t = t;
     currentHitRecord.p = intersection;
     currentHitRecord.n = normal;
+    currentHitRecord.material = &getSurface().material;
 
     return true;
 }
